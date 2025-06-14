@@ -116,14 +116,14 @@ Les métriques RMSE et MAE sont calculées pour chaque modèle sur la période d
         - RMSE
         - MAE
       * - SARIMA
-        - (votre valeur RMSE)
-        - (votre valeur MAE)
+        - 0.027777
+        - 0.020787
       * - XGBoost
-        - **(votre valeur RMSE)**
-        - **(votre valeur MAE)**
+        - **0.028302**
+        - *0.0204408**
       * - LSTM
-        - (votre valeur RMSE)
-        - (votre valeur MAE)
+        - 0.031210
+        - 0.024639
 
 .. image:: _static/votre_image_bar_chart_erreurs.png
    :alt: Comparaison des erreurs des modèles
