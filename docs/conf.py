@@ -25,3 +25,6 @@ language = 'FR'
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+# Configuration pour nbsphinx
+nbsphinx_execute = 'auto' # Exécute les notebooks lors de la construction
