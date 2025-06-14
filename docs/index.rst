@@ -107,6 +107,9 @@ Suivez nos tutoriels pour maîtriser le projet :
    user_guide/index
    user_guide/data_sources
    user_guide/correlation_analysis
+   data 
+   model_sarima
+   model_xgboost
 
 
 .. toctree::
