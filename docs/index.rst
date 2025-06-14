@@ -19,7 +19,10 @@ Welcome to Analyse et Prédiction Temporelle du NDVI pour la Région Fès-Meknè
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
+   data
+   model_training
+   evaluation_metrics
+   interface
 ###########################################################
 Analyse Agro-Climatique Fès-Meknès
 ###########################################################
