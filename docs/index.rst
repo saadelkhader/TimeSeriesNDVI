@@ -10,11 +10,6 @@ Welcome to Analyse et Prédiction Temporelle du NDVI pour la Région Fès-Meknè
    :maxdepth: 2
    :caption: Contenu du Projet
 
-   data
-   modelisation
-   analyse
-   conclusion
-
 
  
 ###########################################################
