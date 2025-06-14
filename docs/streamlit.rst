@@ -118,9 +118,13 @@ Conclusion
 **************************************************
 
 Vous avez maintenant toutes les clés pour démarrer avec Streamlit. Vous avez appris à :
+
 * **Installer** la bibliothèque.
+
 * **Créer** une application avec du texte, des titres et des widgets interactifs comme des sliders et des boutons.
+
 * **Afficher** des données structurées comme des DataFrames Pandas.
+
 * **Lancer** votre application localement.
 
 À partir de là, vous pouvez explorer les nombreux autres widgets disponibles (`st.selectbox`, `st.file_uploader`, etc.) et commencer à construire des tableaux de bord pour vos propres projets de data science.
