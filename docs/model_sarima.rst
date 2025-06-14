@@ -5,8 +5,11 @@ Modélisation et Prédiction du NDVI avec SARIMA
 Cette page détaille la méthodologie complète utilisée pour construire, entraîner et évaluer un modèle **SARIMA** (Seasonal AutoRegressive Integrated Moving Average) dans le but de prédire l'évolution future de l'indice de végétation (NDVI) dans la région Fès-Meknès.
 
 Le processus se décompose en trois phases principales :
+
 1.  **Analyse et Préparation des Données** : Étude de la série temporelle pour comprendre ses caractéristiques.
+
 2.  **Construction du Modèle SARIMA** : Recherche des meilleurs paramètres et entraînement du modèle.
+
 3.  **Prédiction et Visualisation** : Utilisation du modèle pour prévoir les valeurs futures et visualiser les résultats.
 
 **************************************************
