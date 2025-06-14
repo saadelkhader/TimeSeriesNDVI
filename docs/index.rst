@@ -9,11 +9,10 @@ Welcome to Analyse et Prédiction Temporelle du NDVI pour la Région Fès-Meknè
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-DATA_INFLUANCE
 
 ## Source des Données
 
-.. note::
+.. ::
 
    Pour ce projet, les données de séries temporelles ont été extraites à l'aide de l'API de **Google Earth Engine**. Les variables collectées incluent :
 
@@ -22,7 +21,14 @@ DATA_INFLUANCE
    * **Humidité**
    * **Précipitations**
 
+## Matrice de Corrélation
 
+Voici l'analyse de corrélation entre les différentes variables étudiées. Elle montre comment des facteurs comme les lumières nocturnes sont liés à la densité de population.
+
+.. image:: _static/matrice_correlation.png
+   :alt: Matrice de corrélation des données
+   :align: center
+   :scale: 80%
 Indices and tables
 ==================
 
