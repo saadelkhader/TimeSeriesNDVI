@@ -3,9 +3,13 @@ Comparaison des Modèles : SARIMA vs. XGBoost vs. LSTM
 ###########################################################
 
 Cette page présente une analyse comparative rigoureuse de trois approches différentes pour la prédiction de la série temporelle du NDVI :
+
 1.  **SARIMA** : Un modèle statistique classique (univarié).
+
 2.  **XGBoost** : Un modèle de Machine Learning basé sur les arbres de décision (multivarié).
+
 3.  **LSTM** : Un modèle de Deep Learning spécialisé dans les séquences (multivarié).
+
 
 L'objectif est d'évaluer objectivement leur performance sur une période de test commune afin de sélectionner le modèle le plus précis et le plus fiable pour ce projet.
 
@@ -119,8 +123,8 @@ Les métriques RMSE et MAE sont calculées pour chaque modèle sur la période d
         - 0.027777
         - 0.020787
       * - XGBoost
-        - **0.028302**
-        - *0.0204408**
+        - 0.028302
+        - 0.0204408
       * - LSTM
         - 0.031210
         - 0.024639
