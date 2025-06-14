@@ -5,10 +5,15 @@
 
 Welcome to Analyse et Prédiction Temporelle du NDVI pour la Région Fès-Meknès's documentation!
 ==============================================================================================
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contenu du Projet
 
+   data
+   modelisation
+   analyse
+   conclusion
 
 
  
