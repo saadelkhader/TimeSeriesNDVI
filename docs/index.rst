@@ -20,103 +20,300 @@ Ce projet présente une analyse des séries temporelles de plusieurs indicateurs
    :maxdepth: 2
    :caption: Contenu Principal:
 
-   DATA_INFLUANCE
+  .. _accueil:
 
+#####################################################################
+Analyse de la Végétation et du Climat dans la Région Fès-Meknès
+#####################################################################
 
-#################################################
-Méthodologie d'Extraction des Données
-#################################################
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   :caption: Contenu:
 
-L'extraction des données a suivi un processus rigoureux en quatre étapes principales, allant de la définition des paramètres à la génération des visualisations finales.
-
-.. _etape1:
-
-1. Initialisation et Définition des Paramètres
-================================================
-
-La première étape consiste à configurer l'environnement de travail et à définir les paramètres fondamentaux de l'analyse.
-
-* **Initialisation de l'API** : Connexion à la plateforme Google Earth Engine.
-* **Définition du Point d'Intérêt (POI)** : Un point géographique spécifique a été choisi pour concentrer l'analyse. Pour cette étude, un point près de la capitale, Rabat, a été sélectionné.
-
-    .. code-block:: python
-
-       point_interet = ee.Geometry.Point(-6.8498, 33.9716)
-
-* **Définition de la Période Temporelle** : Une période de quatre ans, du **1er janvier 2017 au 31 décembre 2020**, a été choisie pour observer les variations saisonnières et les tendances à moyen terme.
-
-.. _etape2:
-
-2. Acquisition des Collections d'Images Satellites
-====================================================
-
-Google Earth Engine héberge un catalogue massif de données géospatiales. Pour cette analyse, les collections d'images suivantes ont été utilisées :
-
-* **NDVI (Indice de Végétation)** : La collection `MODIS/061/MOD13A2` a été utilisée pour suivre la santé et la densité de la végétation. La bande spectrale 'NDVI' a été sélectionnée.
-
-* **Température de Surface** : La collection `MODIS/061/MOD11A2` a fourni les données de température de surface terrestre (LST). La bande 'LST_Day_1km' a été utilisée.
-
-* **Précipitations** : Les données de précipitations quotidiennes proviennent de la collection `UCSB-CHG/CHIRPS/DAILY`.
+   self
 
 .. note::
-   Les données d'humidité n'étant pas directement disponibles dans une collection simple et compatible, leur graphique est présenté à titre illustratif dans ce projet.
+   Ce projet utilise l'API Google Earth Engine (GEE) pour collecter et analyser des données géospatiales. Une authentification et un projet GEE valide sont nécessaires pour exécuter le code.
 
-.. _etape3:
+**Objectif du projet :** Analyser l'évolution de la santé de la végétation (via l'indice NDVI) dans la région Fès-Meknès au Maroc entre 2018 et 2025, et étudier sa corrélation avec des variables météorologiques clés telles que les précipitations, la température et l'humidité relative.
 
-3. Extraction et Transformation des Données (GEE vers Pandas)
-==============================================================
+**Périmètre géographique :**
+* **Région :** Fès-Meknès, Maroc
+* **Coordonnées (approximatives) :** de -5.8° à -3.0° de longitude et de 33.0° à 34.5° de latitude.
 
-Cette étape cruciale consiste à extraire les valeurs des pixels correspondant à notre point d'intérêt pour chaque image dans la période définie.
-
-* **Filtrage des collections** : Chaque collection a été filtrée par date et par localisation (le POI).
-* **Extraction des valeurs** : La fonction `geemap.ee_to_pandas` a été utilisée pour interroger le serveur de Google Earth Engine et rapatrier les données sous la forme d'un **DataFrame Pandas** pour chaque variable.
-* **Nettoyage des données** : Une fois les données en local, elles ont été nettoyées :
-    * La colonne de temps (timestamp) a été convertie au format `datetime`.
-    * Cette colonne a été définie comme index du DataFrame pour faciliter les manipulations temporelles.
-
-.. _etape4:
-
-4. Traitement Final et Visualisation
-=======================================
-
-La dernière étape consiste à traiter les données brutes pour les rendre interprétables et à les visualiser.
-
-* **Application des Facteurs d'Échelle** : Les données MODIS ne sont pas stockées dans leurs unités réelles. Les facteurs d'échelle fournis dans la documentation de Google Earth Engine ont été appliqués pour convertir les valeurs en unités standards.
-    * Pour le NDVI : `valeur * 0.0001`
-    * Pour la Température : `(valeur * 0.02) - 273.15` pour convertir du Kelvin au Celsius.
-
-* **Génération des Graphiques** : Pour chaque variable, un graphique linéaire a été généré avec `matplotlib` pour visualiser son évolution dans le temps.
-* **Sauvegarde en PNG** : Chaque graphique a été automatiquement sauvegardé sous forme de fichier image `.png` dans le dossier `_static/` de la documentation, prêt à être affiché sur le site.
+**Source des données :**
+* **NDVI :** Images satellite Landsat 8 (Collection 2, Tier 1, Surface Reflectance).
+* **Précipitations :** Données CHIRPS Daily.
+* **Température & Humidité :** Données ERA5-Land Hourly.
 
 ---
-.. centered::
-   **Visualisation des Séries Temporelles**
 
-.. list-table::
-   :widths: 50 50
-   :class: nounderline
+*********************************************************
+Étape 1 : Acquisition et Prétraitement des Données
+*********************************************************
 
-   * - .. image:: _static/serie_ndvi.png
-          :alt: Série temporelle du NDVI
+Cette première étape consiste à extraire les séries temporelles pour chaque variable depuis Google Earth Engine.
 
-     - .. image:: _static/serie_temperature.png
-          :alt: Série temporelle de la température
+1.1. Indice de Végétation (NDVI) lissé
+==========================================
+Nous calculons le NDVI moyen pour chaque image Landsat 8 disponible avec une couverture nuageuse inférieure à 10%. Une moyenne mobile est ensuite appliquée pour lisser les variations à court terme.
 
-   * - .. image:: _static/serie_precipitation.png
-          :alt: Série temporelle des précipitations
+.. code-block:: python
+   :caption: Script d'extraction et lissage du NDVI
 
-     - .. image:: _static/serie_humidite.png
-          :alt: Série temporelle de l'humidité
+   import ee
+   import pandas as pd
+   import matplotlib.pyplot as plt
+   from tqdm import tqdm
 
-## Matrice de Corrélation
+   # Définir la géométrie et la période
+   roi_fes_meknes = ee.Geometry.Rectangle([-5.8, 33.0, -3.0, 34.5])
+   start_date = "2018-01-01"
+   end_date = "2025-01-01"
 
-Voici l'analyse de corrélation entre les différentes variables étudiées. Elle montre comment des facteurs comme les lumières nocturnes sont liés à la densité de population.
+   # Charger la collection Landsat 8
+   landsat = ee.ImageCollection("LANDSAT/LC08/C02/T1_L2") \
+       .filterBounds(roi_fes_meknes) \
+       .filterDate(start_date, end_date) \
+       .filter(ee.Filter.lt("CLOUD_COVER", 10))
 
-.. image:: _static/matrice_correlation.png
-   :alt: Matrice de corrélation des données
+   # Fonction pour calculer NDVI moyen par image
+   def get_ndvi_feature(image):
+       ndvi = image.normalizedDifference(["SR_B5", "SR_B4"]).rename("NDVI")
+       date = image.date().format("YYYY-MM-dd")
+       mean_dict = ndvi.reduceRegion(
+           reducer=ee.Reducer.mean(),
+           geometry=roi_fes_meknes,
+           scale=100,
+           maxPixels=1e9
+       )
+       return ee.Feature(None, {'date': date, 'NDVI': mean_dict.get('NDVI')})
+
+   # Appliquer la fonction et extraire les données
+   ndvi_fc = landsat.map(get_ndvi_feature)
+   features = ndvi_fc.toList(ndvi_fc.size())
+   ndvi_data = []
+   for i in tqdm(range(features.size().getInfo()), desc="Extraction NDVI"):
+       f = ee.Feature(features.get(i)).getInfo()
+       props = f['properties']
+       if 'NDVI' in props and props['NDVI'] is not None:
+           ndvi_data.append(props)
+
+   # Créer et nettoyer le DataFrame
+   df = pd.DataFrame(ndvi_data)
+   df["date"] = pd.to_datetime(df["date"])
+   df["NDVI"] = pd.to_numeric(df["NDVI"], errors="coerce")
+   df = df.dropna()
+   df_mean = df.groupby("date").mean().reset_index()
+   df_mean["NDVI_smoothed"] = df_mean["NDVI"].rolling(window=5, center=True).mean()
+
+   # Sauvegarder le CSV
+   df_mean.to_csv("ndvi_grouped_smoothed_fes_meknes.csv", index=False)
+   print("✅ CSV du NDVI exporté avec succès.")
+
+
+1.2. Précipitations (CHIRPS)
+============================
+Extraction des précipitations journalières moyennes (en mm) sur la zone d'étude.
+
+.. code-block:: python
+   :caption: Script d'extraction des précipitations
+
+   # ... (importations ee, pd, etc.)
+   chirps = ee.ImageCollection("UCSB-CHG/CHIRPS/DAILY") \
+       .filterBounds(roi_fes_meknes) \
+       .filterDate(start_date, end_date) \
+       .select("precipitation")
+
+   def extract_daily_precip(image):
+       date = image.date().format("YYYY-MM-dd")
+       mean_rain = image.reduceRegion(reducer=ee.Reducer.mean(), geometry=roi_fes_meknes, scale=5000, maxPixels=1e9)
+       return ee.Feature(None, {"date": date, "precipitation": mean_rain.get("precipitation")})
+
+   rain_fc = chirps.map(extract_daily_precip)
+   # ... (même logique d'extraction en DataFrame que pour le NDVI)
+   # ...
+   # df_rain.to_csv("serie_precipitation_fes_meknes.csv", index=False)
+
+
+1.3. Température (ERA5-Land)
+================================
+Extraction de la température de l'air à 2 mètres (en °C) à midi (12:00) pour chaque jour.
+
+.. code-block:: python
+   :caption: Script d'extraction de la température
+
+   # ... (importations ee, pd, etc.)
+   def extract_daily_temp(image):
+       date = image.date().format("YYYY-MM-dd")
+       temp_c = image.select("temperature_2m").subtract(273.15) # K en °C
+       mean_temp = temp_c.reduceRegion(reducer=ee.Reducer.mean(), geometry=roi_fes_meknes, scale=1000, maxPixels=1e9)
+       return ee.Feature(None, {"date": date, "temperature": mean_temp.get("temperature_2m")})
+
+   # Boucle par année pour éviter les timeouts GEE
+   all_temp_data = []
+   for year in range(2018, 2026):
+       # ...
+       era5 = ee.ImageCollection("ECMWF/ERA5_LAND/HOURLY") \
+           .filterBounds(roi_fes_meknes) \
+           .filterDate(f"{year}-01-01", f"{year}-12-31") \
+           .filter(ee.Filter.calendarRange(12, 12, 'hour')) \
+           .select("temperature_2m")
+       # ... (logique d'extraction similaire)
+   # df_temp.to_csv("serie_temperature_fes_meknes.csv", index=False)
+
+1.4. Humidité Relative (ERA5-Land)
+=====================================
+Calcul et extraction de l'humidité relative journalière (en %) à partir de la température de l'air et du point de rosée.
+
+.. code-block:: python
+   :caption: Script de calcul et d'extraction de l'humidité relative
+
+   # ... (importations ee, pd, etc.)
+   def compute_relative_humidity(image):
+       temp = image.select("temperature_2m").subtract(273.15)
+       dew = image.select("dewpoint_temperature_2m").subtract(273.15)
+       # Formule de Magnus pour calculer la pression de vapeur saturante
+       es = temp.multiply(17.625).divide(temp.add(243.04)).exp()
+       ed = dew.multiply(17.625).divide(dew.add(243.04)).exp()
+       rh = ed.divide(es).multiply(100).rename("RH")
+       mean_rh = rh.reduceRegion(reducer=ee.Reducer.mean(), geometry=roi_fes_meknes, scale=1000)
+       return ee.Feature(None, {"date": image.date().format("YYYY-MM-dd"), "RH": mean_rh.get("RH")})
+   # ... (logique d'extraction similaire par année)
+   # df_rh.to_csv("humidite_relative_fes_meknes.csv", index=False)
+
+---
+
+***********************************************
+Étape 2 : Fusion et Nettoyage des Données
+***********************************************
+Les différents fichiers CSV générés sont fusionnés en un seul DataFrame pandas sur la base de la colonne `date`.
+
+.. code-block:: python
+   :caption: Script de fusion des séries temporelles
+
+   import pandas as pd
+
+   # Charger chaque CSV
+   df_ndvi = pd.read_csv("ndvi_grouped_smoothed_fes_meknes.csv")
+   df_precip = pd.read_csv("serie_precipitation_fes_meknes.csv")
+   df_temp = pd.read_csv("serie_temperature_fes_meknes.csv")
+   df_rh = pd.read_csv("humidite_relative_fes_meknes.csv")
+
+   # Convertir les dates
+   df_ndvi["date"] = pd.to_datetime(df_ndvi["date"])
+   # ... (faire de même pour les autres DataFrames)
+
+   # Fusions successives
+   df_all = pd.merge(df_ndvi, df_precip, on="date", how="inner")
+   df_all = pd.merge(df_all, df_temp, on="date", how="inner")
+   df_all = pd.merge(df_all, df_rh, on="date", how="inner")
+
+   # Nettoyage final (suppression des lignes avec valeurs manquantes)
+   df_all_cleaned = df_all.dropna().reset_index(drop=True)
+   
+   # Exporter le jeu de données final
+   df_all_cleaned.to_csv("donnees_fusionnees_fes_meknes_nettoyees.csv", index=False)
+   print("✅ DataFrame fusionné et nettoyé exporté.")
+
+---
+
+***************************************
+Étape 3 : Analyse et Visualisation
+***************************************
+
+3.1. Carte du NDVI Médian (2018-2025)
+=====================================
+Une carte est générée en calculant la médiane du NDVI pour chaque pixel sur toute la période. La médiane est utilisée pour sa robustesse aux valeurs extrêmes (ex: nuages non détectés).
+
+.. image:: carte_ndvi_moyen_fes_meknes.png
+   :alt: Carte du NDVI médian de la région Fès-Meknès
    :align: center
-   :scale: 80%
-Indices and tables
+   :width: 80%
+
+.. code-block:: python
+   :caption: Génération de la carte NDVI
+
+   # ... (voir le code de génération de la carte dans les scripts fournis)
+
+3.2. Visualisation des Séries Temporelles Combinées
+==================================================
+Un graphique superposant les quatre variables (NDVI, précipitations, température, humidité) est créé pour une analyse visuelle des tendances et saisonnalités.
+
+.. image:: graph_combine.png
+   :alt: Graphique combiné des séries temporelles
+   :align: center
+
+.. code-block:: python
+   :caption: Création du graphique multi-axes
+
+   # ... (voir le code de génération du graphique dans les scripts fournis)
+
+
+3.3. Matrice de Corrélation
+===========================
+Une heatmap est générée pour quantifier la corrélation linéaire entre les variables.
+
+.. image:: heatmap_correlation_fes_meknes.png
+   :alt: Heatmap des corrélations
+   :align: center
+   :width: 60%
+
+.. code-block:: python
+   :caption: Calcul et affichage de la matrice de corrélation
+
+   import seaborn as sns
+   import matplotlib.pyplot as plt
+
+   # Sélectionner les colonnes numériques pertinentes
+   colonnes_pour_correlation = ['NDVI_smoothed', 'precipitation', 'temperature', 'RH']
+   df_pour_correlation = df_all_cleaned[colonnes_pour_correlation]
+
+   # Calculer la matrice
+   matrice_correlation = df_pour_correlation.corr()
+
+   # Visualiser
+   plt.figure(figsize=(10, 8))
+   sns.heatmap(matrice_correlation, annot=True, cmap='coolwarm', fmt=".2f")
+   plt.title('Heatmap de Corrélation entre NDVI et Variables Météo')
+   plt.show()
+
+---
+
+*********************************************************
+Étape 4 : Analyse de Corrélation avec Décalage Temporel
+*********************************************************
+La végétation ne réagit pas instantanément aux changements climatiques. Cette analyse introduit un décalage temporel (lag) sur les variables météorologiques pour trouver la corrélation maximale avec le NDVI.
+
+.. code-block:: python
+   :caption: Calcul des corrélations avec décalage
+
+   df_lag = df_all_cleaned.copy()
+
+   # Définir les décalages à tester (en jours)
+   lags = [15, 30, 45, 60, 75, 90]
+
+   for lag in lags:
+       df_lag[f'precipitation_lag{lag}'] = df_lag['precipitation'].shift(lag)
+       df_lag[f'temperature_lag{lag}'] = df_lag['temperature'].shift(lag)
+       df_lag[f'RH_lag{lag}'] = df_lag['RH'].shift(lag)
+
+   # Nettoyer les NaN créés par le décalage
+   df_lag_cleaned = df_lag.dropna()
+
+   # Recalculer la matrice de corrélation
+   matrice_correlation_lag = df_lag_cleaned.corr()
+
+   # Afficher les corrélations les plus fortes avec le NDVI
+   print(matrice_correlation_lag['NDVI_smoothed'].sort_values(ascending=False))
+
+
+**Résultats attendus :** Cette analyse permet d'identifier, par exemple, que le pic de NDVI est le plus fortement corrélé avec les précipitations tombées **45 jours** auparavant, fournissant un aperçu précieux sur l'inertie de l'écosystème local. Des nuages de points sont ensuite utilisés pour visualiser ces relations décalées.
+
+
+
+
 ==================
 
 * :ref:`genindex`
