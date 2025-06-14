@@ -139,30 +139,9 @@ Temps de Réponse de l'Écosystème
 - **Temps de Latence à la Pluie**: ~45 jours pour un impact maximal sur le NDVI.
 - **Impact de la Température**: Effet plus rapide, visible en 1 à 2 semaines.
 
-Résumé des Sources de Données
------------------------------
 
-**Données Satellites Extraites via Google Earth Engine**
 
-.. list-table::
-   :header-rows: 1
-
-   * - Source de Données
-     - Variables Extraites
-     - Résolution Native
-     - Fournisseur
-   * - Landsat 8 (OLI/TIRS)
-     - NDVI (Santé de la végétation)
-     - 30 mètres
-     - USGS / NASA
-   * - ERA5-Land Hourly
-     - Température de l'air, Humidité Relative
-     - ~11 km
-     - ECMWF / Copernicus
-   * - CHIRPS Daily
-     - Précipitations
-     - ~5.5 km
-     - Climate Hazards Group
+  
 
 Auteurs
 -------
