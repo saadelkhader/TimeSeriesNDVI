@@ -12,7 +12,7 @@ Welcome to Analyse et Prédiction Temporelle du NDVI pour la Région Fès-Meknè
 
 ## Source des Données
 
-.. ::
+.. :note:
 
    Pour ce projet, les données de séries temporelles ont été extraites à l'aide de l'API de **Google Earth Engine**. Les variables collectées incluent :
 
