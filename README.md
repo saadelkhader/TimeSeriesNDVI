@@ -28,3 +28,4 @@ Description : Un modèle d'apprentissage automatique (Machine Learning) basé su
 Rôle : Utiliser l'ensemble des facteurs (température, pluie, humidité, et leurs versions décalées) comme des caractéristiques indépendantes pour prédire la valeur du NDVI.
 Objectif Final et Bénéfices
 L'objectif ultime est de comparer les performances de ces trois modèles pour identifier le plus précis et le plus fiable pour prévoir la santé de la végétation dans la région. Un tel outil prédictif a des applications concrètes de grande valeur, notamment pour l'agriculture de précision, la gestion anticipée des ressources en eau et la prévention des sécheresses.
+ lien readthedocs: https://timeseriesndvi.readthedocs.io/fr/latest/index.html#
