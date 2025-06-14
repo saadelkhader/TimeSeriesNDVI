@@ -112,6 +112,7 @@ Suivez nos tutoriels pour maîtriser le projet :
    model_xgboost
    model_LSTM
    comparaison_models
+   streamlit
 
 
 .. toctree::
