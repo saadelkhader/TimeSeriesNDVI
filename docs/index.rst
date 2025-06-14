@@ -110,6 +110,7 @@ Suivez nos tutoriels pour maîtriser le projet :
    data 
    model_sarima
    model_xgboost
+   model_LSTM
 
 
 .. toctree::
