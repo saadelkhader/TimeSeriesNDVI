@@ -10,7 +10,7 @@ Welcome to Analyse et Prédiction Temporelle du NDVI pour la Région Fès-Meknè
    :caption: Contents:
 
    installation
-   dataset
+   data
    model_training
    evaluation_metrics
    interface
@@ -71,46 +71,6 @@ Génère automatiquement des cartes, des graphiques de séries temporelles et de
 📈 **Quantification du Temps de Réponse**
 Fournit des métriques claires sur le décalage optimal entre un événement climatique et la réponse de la végétation.
 
-Quick Start
------------
-
-.. code-block:: bash
-
-   # Clonez le dépôt (remplacez par votre URL)
-   git clone https://github.com/votre-nom/votre-projet.git
-   cd votre-projet
-
-   # Installez les dépendances
-   pip install -r requirements.txt
-
-   # Exécutez le notebook principal ou le script d'analyse
-   jupyter notebook analyse_principale.ipynb
-
-.. code-block:: python
-
-   import pandas as pd
-   from scripts.data_extractor import Extractor # Module conceptuel
-   from scripts.data_processor import Processor # Module conceptuel
-
-   # Initialiser les modules
-   extractor = Extractor(region_name='Fes-Meknes', start='2018-01-01', end='2025-01-01')
-   processor = Processor()
-
-   # 1. Extraire toutes les données et les sauvegarder en CSV
-   extractor.extract_all_variables()
-   print("✅ Extraction de toutes les séries temporelles terminée.")
-
-   # 2. Fusionner les données en un seul DataFrame
-   df_merged = processor.merge_data(
-       files=['ndvi.csv', 'temperature.csv', 'precipitation.csv', 'humidity.csv']
-   )
-   print("✅ Fusion des données terminée.")
-   print("Shape du DataFrame final:", df_merged.shape)
-
-   # 3. Analyser la corrélation avec décalage
-   correlation_results = processor.analyze_lag_correlation(df_merged, target_variable='NDVI_smoothed')
-   print("Corrélation la plus forte trouvée :")
-   print(correlation_results.head(1))
 
 Getting Started Tutorials
 -------------------------
